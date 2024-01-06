@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+
+        #icons {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        #text-area, #response-area {
+            width: 60%;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        img {
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        img:hover {
+            border: 2px solid #333;
+        }
+
+        button {
+            padding: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="icons">
+            <img src="your_icon_image_path/icon1.png" onclick="generateText('What are your services?')">
+            <img src="your_icon_image_path/icon2.png" onclick="generateText('I want to make an appointment.')">
+            <img src="your_icon_image_path/icon3.png" onclick="generateText('what is your address? How can I reach your address?')">
+            <img src="your_icon_image_path/icon4.png" onclick="generateText('Show me service number 1')">
+        </div>
+        <div>
+            <textarea id="generated-text" rows="5" cols="40" readonly></textarea>
+        </div>
+        <div>
+            <button onclick="submitForm()">Submit</button>
+        </div>
+        <div>
+            <textarea id="response-text" rows="5" cols="40" readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        function generateText(text) {
+            document.getElementById('generated-text').value = text;
+        }
+
+        function submitForm() {
+            var generatedText = document.getElementById('generated-text').value;
+
+            // Make an AJAX request to the webhook address
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://hook.eu2.make.com/h2ln0365ab76x8hoxcobn327ba8fxkuh', true); // Replace with your actual webhook address
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        document.getElementById('response-text').value = response.answer || 'No answer received from the webhook';
+                    } else {
+                        document.getElementById('response-text').value = 'Error: Unable to connect to the webhook';
+                    }
+                }
+            };
+            xhr.send('submitted_text=' + encodeURIComponent(generatedText));
+        }
+    </script>
+</body>
+</html>
